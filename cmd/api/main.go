@@ -8,6 +8,8 @@ import (
 	"github.com/jess-monter/social/internal/store"
 )
 
+const version = "0.0.1"
+
 func main() {
 
 	cfg := config{
@@ -18,6 +20,7 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 25),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
+		env: env.GetString("ENV", "development"),
 	}
 
 	db, err := db.New(
