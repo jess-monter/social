@@ -1,14 +1,12 @@
 package env
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 )
 
 func GetString(key, fallback string) string {
 	val, ok := os.LookupEnv(key)
-	fmt.Printf("Key: %s, Value: %s, Found: %t\n", key, val, ok)
 	if !ok {
 		return fallback
 	}
