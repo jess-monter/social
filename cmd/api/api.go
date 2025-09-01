@@ -51,6 +51,9 @@ func (app *application) mount() http.Handler {
 	// This allows us to maintain backward compatibility when we introduce new versions of the API.
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
+		r.Route("/posts", func(r chi.Router) {
+			r.Post("/", app.createPostHandler)
+		})
 	})
 
 	return r
