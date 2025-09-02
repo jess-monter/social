@@ -92,3 +92,31 @@ func (s *PostStore) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+func (s *PostStore) Update(ctx context.Context, post *Post) error {
+	query := `
+		UPDATE posts
+		SET content = $1, title = $2, tags = $3, updated_at = NOW()
+		WHERE id = $4
+		RETURNING updated_at
+	`
+	err := s.db.QueryRowContext(
+		ctx,
+		query,
+		post.Content,
+		post.Title,
+		pq.Array(post.Tags),
+		post.ID,
+	).Scan(&post.UpdatedAt)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrRecordNotFound
+		default:
+			return err
+		}
+	}
+
+	return nil
+}
