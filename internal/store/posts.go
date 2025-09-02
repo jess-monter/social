@@ -17,6 +17,7 @@ type Post struct {
 	CreatedAt string     `json:"created_at"`
 	UpdatedAt string     `json:"updated_at"`
 	Comments  []*Comment `json:"comments"`
+	Version   int64      `json:"version"`
 }
 
 type PostStore struct {
@@ -46,7 +47,7 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 
 func (s *PostStore) GetPostByID(ctx context.Context, id int64) (*Post, error) {
 	query := `
-		SELECT id, content, title, user_id, tags, created_at, updated_at
+		SELECT id, content, title, user_id, tags, created_at, updated_at, version
 		FROM posts
 		WHERE id = $1
 	`
@@ -59,6 +60,7 @@ func (s *PostStore) GetPostByID(ctx context.Context, id int64) (*Post, error) {
 		pq.Array(&post.Tags),
 		&post.CreatedAt,
 		&post.UpdatedAt,
+		&post.Version,
 	)
 	if err != nil {
 		switch {
@@ -96,9 +98,9 @@ func (s *PostStore) Delete(ctx context.Context, id int64) error {
 func (s *PostStore) Update(ctx context.Context, post *Post) error {
 	query := `
 		UPDATE posts
-		SET content = $1, title = $2, tags = $3, updated_at = NOW()
-		WHERE id = $4
-		RETURNING updated_at
+		SET content = $1, title = $2, tags = $3, updated_at = NOW(), version = version + 1
+		WHERE id = $4 AND version = $5
+		RETURNING version
 	`
 	err := s.db.QueryRowContext(
 		ctx,
@@ -107,7 +109,8 @@ func (s *PostStore) Update(ctx context.Context, post *Post) error {
 		post.Title,
 		pq.Array(post.Tags),
 		post.ID,
-	).Scan(&post.UpdatedAt)
+		post.Version,
+	).Scan(&post.Version)
 
 	if err != nil {
 		switch {
