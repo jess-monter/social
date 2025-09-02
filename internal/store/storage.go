@@ -8,6 +8,8 @@ import (
 type Storage struct {
 	Posts interface {
 		Create(context.Context, *Post) error
+		Delete(context.Context, int64) error
+		Update(context.Context, *Post) error
 		GetPostByID(context.Context, int64) (*Post, error)
 	}
 	Users interface {
