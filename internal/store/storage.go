@@ -3,7 +3,10 @@ package store
 import (
 	"context"
 	"database/sql"
+	"time"
 )
+
+var QueryTimeoutDuration = time.Second * 5
 
 type Storage struct {
 	Posts interface {
