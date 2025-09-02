@@ -40,3 +40,30 @@ func (s *UserStore) Create(ctx context.Context, user *User) error {
 	}
 	return nil
 }
+
+func (s *UserStore) GetUserByID(ctx context.Context, id int64) (*User, error) {
+	query := `
+		SELECT id, username, email, created_at
+		FROM users
+		WHERE id = $1
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	user := &User{}
+	err := s.db.QueryRowContext(ctx, query, id).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrRecordNotFound // User not found
+		}
+		return nil, err
+	}
+	return user, nil
+}
