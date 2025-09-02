@@ -34,7 +34,7 @@ func (app *application) createCommentHandler(w http.ResponseWriter, r *http.Requ
 		app.internalServerError(w, r, err)
 		return
 	}
-	if err := writeJSON(w, http.StatusCreated, comment); err != nil {
+	if err := jsonResponse(w, http.StatusCreated, comment); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
