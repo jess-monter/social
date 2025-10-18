@@ -80,3 +80,6 @@ secrets.json
 # Backup files
 *.bak
 *.backup
+
+# Auto generated docs
+/docs/

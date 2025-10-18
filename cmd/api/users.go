@@ -12,6 +12,20 @@ type userKey string
 
 const userCtx userKey = "user"
 
+// GetUser godoc
+//
+//	@Summary		Get User
+//	@Description	Retrieve user information by user ID.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"User ID"
+//	@Success		200	{object}	store.User
+//	@Failure		400	{object}	error
+//	@Failure		404	{object}	error	"Resource Not Found"
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/users/{id} [get]
 func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromContext(r)
 
@@ -24,6 +38,20 @@ type FollowUser struct {
 	UserID int64 `json:"user_id"`
 }
 
+// FollowUser godoc
+//
+//	@Summary		Follow User
+//	@Description	Follow a user by their ID.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	body		int	true	"User ID"
+//	@Success		200	{object}	store.User
+//	@Failure		400	{object}	error
+//	@Failure		404	{object}	error	"Resource Not Found"
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/users/{id}/follow [put]
 func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromContext(r)
 
@@ -44,6 +72,20 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 
 }
 
+// UnfollowUser godoc
+//
+//	@Summary		Follow User
+//	@Description	Follow a user by their ID.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	body		int	true	"User ID"
+//	@Success		200	{object}	store.User
+//	@Failure		400	{object}	error
+//	@Failure		404	{object}	error	"Resource Not Found"
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/users/{id}/unfollow [put]
 func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromContext(r)
 

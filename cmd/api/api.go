@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -8,6 +9,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jess-monter/social/internal/store"
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	"github.com/jess-monter/social/docs"
 )
 
 type application struct {
@@ -16,9 +20,10 @@ type application struct {
 }
 
 type config struct {
-	addr string
-	db   dbConfig
-	env  string
+	addr   string
+	db     dbConfig
+	env    string
+	apiURL string
 }
 
 type dbConfig struct {
@@ -44,6 +49,12 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	// Set a timeout value for all requests.
+	// This will return a 503 Service Unavailable error if
+	// the request takes longer than the specified duration.
+	// Adjust this value as needed for your application.
+	r.Use(middleware.Timeout(60 * time.Second))
+
 	// Here we define a route group for version 1 of our API.
 	// This is a good practice to allow for future versions of the API.
 	// All routes for version 1 will be prefixed with /v1.
@@ -51,6 +62,10 @@ func (app *application) mount() http.Handler {
 	// This allows us to maintain backward compatibility when we introduce new versions of the API.
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
+
+		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
+		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
+
 		r.Route("/posts", func(r chi.Router) {
 			r.Post("/", app.createPostHandler)
 			r.Route("/{postID}", func(r chi.Router) {
@@ -80,6 +95,13 @@ func (app *application) mount() http.Handler {
 }
 
 func (app *application) run(mux http.Handler) error {
+
+	// Docs Info
+	docs.SwaggerInfo.Title = "Social API"
+	docs.SwaggerInfo.Description = "This is a sample server Social server."
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Host = app.config.apiURL
+	docs.SwaggerInfo.BasePath = "/v1"
 
 	server := &http.Server{
 		Addr:         app.config.addr,
