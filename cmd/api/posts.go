@@ -25,6 +25,22 @@ type UpdatePostPayload struct {
 	Tags    []string `json:"tags" validate:"omitempty"`
 }
 
+// CreatePost godoc
+//
+//	@Summary		Create Post
+//	@Description	Create a new post.
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			content	body		string	true	"Post Content"
+//	@Param			title	body		string	true	"Post Title"
+//	@Param			tags	body		array	true	"Post Tags"
+//	@Success		200		{object}	store.Post
+//	@Failure		400		{object}	error
+//	@Failure		404		{object}	error	"Resource Not Found"
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts [post]
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePostPayload
 	if err := readJSON(w, r, &payload); err != nil {
@@ -57,6 +73,23 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// UpdatePost godoc
+//
+//	@Summary		Update Post
+//	@Description	Update an existing post.
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path		int		true	"Post ID"
+//	@Param			content	body		string	false	"Post Content"
+//	@Param			title	body		string	false	"Post Title"
+//	@Param			tags	body		array	false	"Post Tags"
+//	@Success		200		{object}	store.Post
+//	@Failure		400		{object}	error
+//	@Failure		404		{object}	error	"Resource Not Found"
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts/{postID} [put]
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromCtx(r)
 
@@ -93,6 +126,20 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// GetPost godoc
+//
+//	@Summary		Get Post
+//	@Description	Get a post by its ID.
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path		int	true	"Post ID"
+//	@Success		200		{object}	store.Post
+//	@Failure		400		{object}	error
+//	@Failure		404		{object}	error	"Resource Not Found"
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts/{postID} [get]
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromCtx(r)
 
@@ -109,6 +156,20 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeletePost godoc
+//
+//	@Summary		Delete Post
+//	@Description	Delete a post by its ID.
+//	@Tags			posts
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path	int	true	"Post ID"
+//	@Success		204
+//	@Failure		400	{object}	error
+//	@Failure		404	{object}	error	"Resource Not Found"
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts/{postID} [delete]
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	postIDParam := chi.URLParam(r, "postID")
 	postID, err := parseID(postIDParam)
